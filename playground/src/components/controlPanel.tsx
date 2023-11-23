@@ -12,12 +12,16 @@ import toast from "react-hot-toast";
 import { humanFileSize } from "../util";
 import ProgressBar from "./progressBar";
 import ModelSelector from "./modelSelector";
-import MicButton, { AudioMetadata } from "./micButton";
 import GearIcon from "./gearIcon";
 import ConfigModal, { ConfigOptions } from "./configModal";
 
 export interface Transcript {
     segments: Array<Segment>;
+}
+
+interface AudioMetadata {
+    file: File;
+    fromMic: boolean;
 }
 
 interface ControlPanelProps {
@@ -45,7 +49,7 @@ const ControlPanel = (props: ControlPanelProps) => {
     const [transcribing, setTranscribing] = useState<boolean>(false);
     const [isConfigOpen, setIsConfigOpen] = useState<boolean>(false);
     const [configOptions, setConfigOptions] = useState<ConfigOptions>({
-        language: null,
+        language: 'zh',
         task: Task.Transcribe,
         suppress_non_speech: true,
     });
@@ -120,6 +124,7 @@ const ControlPanel = (props: ControlPanelProps) => {
             };
         });
         setTranscribing(true);
+        props.setDownloadAvailable(false);
         await initialize();
         let builder = new DecodingOptionsBuilder();
         if (configOptions.language)
@@ -130,6 +135,8 @@ const ControlPanel = (props: ControlPanelProps) => {
             builder = builder.setSuppressTokens(Int32Array.from([]));
 
         builder = builder.setTask(configOptions.task);
+        builder = builder.setPrompt("呃，就是就是一段嘛简简体普通话呢，然后啊然后夹杂部分word吧，哎，哈哈哈，嗯。");
+        // builder = builder.setTemperature(0.0);
         const options = builder.build();
         console.log("Options: ", options);
 
@@ -164,16 +171,6 @@ const ControlPanel = (props: ControlPanelProps) => {
             />
             <div className="flex-1 w-1/2 h-full flex flex-col relative z-10 overflow-hidden">
                 <div className="h-full px-4 xl:pl-32 my-4">
-                    <img
-                        src="/whisper-turbo.png"
-                        className="w-full xl:w-3/4 2xl:w-1/2 mx-auto pt-8 pb-4 cursor-pointer"
-                        onClick={() =>
-                            window.open(
-                                "https://github.com/FL33TW00D/whisper-turbo",
-                                "_blank"
-                            )
-                        }
-                    />
                     <div className="flex flex-col mx-auto gap-6">
                         <div>
                             <ModelSelector
@@ -224,14 +221,9 @@ const ControlPanel = (props: ControlPanelProps) => {
                                     name="audioFile"
                                     id="audioFile"
                                     onChange={handleAudioFile()}
-                                    accept=".wav,.aac,.m4a,.mp4,.mp3"
+                                    accept=".wav,.aac,.m4a,.mp3"
                                 />
                             </div>
-                            <MicButton
-                                setBlobUrl={setBlobUrl}
-                                setAudioData={setAudioData}
-                                setAudioMetadata={setAudioMetadata}
-                            />
                         </div>
                         {blobUrl && (
                             <div>
@@ -240,11 +232,9 @@ const ControlPanel = (props: ControlPanelProps) => {
                                 </label>
                                 <audio
                                     controls
+                                    id="audioPlayer"
                                     key={blobUrl}
                                     className="mx-auto w-full"
-                                    style={{
-                                        fontFamily: "__VT323_2a9463",
-                                    }}
                                 >
                                     <source
                                         key={blobUrl}
@@ -278,17 +268,6 @@ const ControlPanel = (props: ControlPanelProps) => {
                             <GearIcon />
                         </button>
                     </div>
-                </div>
-                <div className="absolute bottom-0 w-full text-center px-4 xl:pl-32">
-                    <p className="text-2xl text-white mx-auto">
-                        Built by{" "}
-                        <a
-                            href="https://twitter.com/fleetwood___"
-                            className="hover:underline hover:text-blue-600"
-                        >
-                            @fleetwood
-                        </a>
-                    </p>
                 </div>
             </div>
         </>

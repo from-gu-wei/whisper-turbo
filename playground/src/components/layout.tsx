@@ -14,9 +14,7 @@ export default function Layout(props: LayoutProps) {
         <div
             className="flex h-full min-h-screen bg-sky-500 -z-20 antialiased"
             style={{
-                backgroundColor: "#38bdf8",
-                backgroundImage:
-                    "url(\"data:image/svg+xml,%3Csvg width='30' height='30' opacity='0.4' viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 10h10v10H0V10zM10 0h10v10H10V0z' fill='%23bae6fd' fill-opacity='0.4' fill-rule='evenodd'/%3E%3C/svg%3E\")",
+                backgroundColor: "#25231F",
             }}
         >
             <Head>
